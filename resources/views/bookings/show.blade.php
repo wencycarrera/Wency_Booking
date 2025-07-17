@@ -55,31 +55,33 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
-
-    // Only the booked date is disabled and marked
-    const bookedDate = new Date(@json($booking->booking_date)).toISOString().slice(0, 10);
+    const bookedDate = new Date(@json($booking->booking_date));
+    const formattedDate = bookedDate.toISOString().slice(0, 10);
+    const timeString = bookedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        selectable: false,
         height: 'auto',
+        selectable: false,
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek'
         },
+        eventDisplay: 'block', // show full event
         events: [{
-            title: 'Booked',
+            title: @json($booking->title) + ' at ' + timeString,
             start: @json($booking->booking_date),
-            display: 'background',
-            backgroundColor: '#f87171'
+            backgroundColor: '#f87171', // red background
+            borderColor: '#f87171',
+            textColor: '#1f2937'
         }],
         dayCellDidMount: function (arg) {
             const day = arg.date.toISOString().slice(0, 10);
-            if (day === bookedDate) {
+            if (day === formattedDate) {
                 arg.el.style.pointerEvents = 'none';
-                arg.el.style.opacity = '0.5';
-                arg.el.style.backgroundColor = '#fca5a5';
+                arg.el.style.opacity = '0.6';
+                arg.el.style.backgroundColor = '#fecaca'; // light red fallback
             }
         }
     });
